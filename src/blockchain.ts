@@ -1,15 +1,17 @@
 import sha256 from "sha256";
 
+import { BlockchainNode } from "./BlockchainNode";
 import { Block } from "./types/Block";
 import { CurrentBlockData } from "./types/CurrentBlockData";
 import { Transaction } from "./types/Transaction";
 import { MINER_REWARD } from "./utils/constants";
 
-export class Blockchain {
+export class Blockchain extends BlockchainNode {
   public chain: Block[] = [];
   public pendingTransactions: Transaction[] = [];
 
-  constructor(private readonly nodeAddress: string = "") {
+  constructor(private readonly nodeAddress: string = "", currentNodeUrl = "") {
+    super(currentNodeUrl);
     this.createNewBlock(100, "0", "0");
   }
 
