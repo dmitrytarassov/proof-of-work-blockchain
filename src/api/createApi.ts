@@ -2,12 +2,15 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 
 import { blockchain } from "./routes/blockchain";
+import { consensus } from "./routes/consensus";
 import { home } from "./routes/home";
 import { mine } from "./routes/mine";
+import { receiveNewBlock } from "./routes/receiveNewBlock";
 import { registerAndBroadcastNode } from "./routes/registerAndBroadcastNode";
 import { registerNode } from "./routes/registerNode";
 import { registerNodesBulk } from "./routes/registerNodesBulk";
 import { transaction } from "./routes/transaction";
+import { transactionBroadcast } from "./routes/transactionBroadcast";
 
 import { Blockchain } from "../blockchain";
 
@@ -28,6 +31,9 @@ export function createApi(
   registerAndBroadcastNode(app, _blockchain);
   registerNode(app, _blockchain);
   registerNodesBulk(app, _blockchain);
+  transactionBroadcast(app, _blockchain);
+  receiveNewBlock(app, _blockchain);
+  consensus(app, _blockchain);
 
   app.listen(port);
 

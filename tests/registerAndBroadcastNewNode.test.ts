@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { SpiedFunction } from "jest-mock";
 
+import { on, off, FetchMock } from "./utils/fetchMock";
 import { getRandomString } from "./utils/getRandomString";
 import { postRequestData } from "./utils/postRequestData";
 
@@ -8,24 +9,8 @@ import { BlockchainNode } from "../src/BlockchainNode";
 import { registerNodeUrl } from "../src/api/routes/registerNode";
 import { registerNodesBulkUrl } from "../src/api/routes/registerNodesBulk";
 
-export const assetsFetchMock = () =>
-  Promise.resolve({
-    ok: true,
-    status: 200,
-    json: async () => ({}),
-  } as Response);
-
 describe("test registerAndBroadcastNewNode", () => {
-  let fetchMock: SpiedFunction<{
-    (
-      input: URL | RequestInfo,
-      init?: RequestInit | undefined
-    ): Promise<Response>;
-    (
-      input: string | URL | Request,
-      init?: RequestInit | undefined
-    ): Promise<Response>;
-  }>;
+  let fetchMock: FetchMock;
 
   const nodeAddress = getRandomString("http://");
   const node = new BlockchainNode(nodeAddress);
@@ -33,7 +18,7 @@ describe("test registerAndBroadcastNewNode", () => {
   const node2Address = getRandomString("http://");
 
   beforeAll(async () => {
-    fetchMock = jest.spyOn(global, "fetch").mockImplementation(assetsFetchMock);
+    fetchMock = on();
     await node.registerAndBroadcastNewNode(node2Address);
   });
 
@@ -100,6 +85,6 @@ describe("test registerAndBroadcastNewNode", () => {
   });
 
   afterAll(() => {
-    jest.restoreAllMocks();
+    off();
   });
 });

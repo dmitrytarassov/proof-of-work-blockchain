@@ -6,6 +6,8 @@ import { getRandomString } from "./utils/getRandomString";
 
 import { Blockchain } from "../src/blockchain";
 import { CurrentBlockData } from "../src/types/CurrentBlockData";
+import { hashBlock } from "../src/utils/hashBlock";
+import { proofOfWork } from "../src/utils/proofOfWork";
 
 describe("proof of work", () => {
   let blockchain: Blockchain;
@@ -26,11 +28,11 @@ describe("proof of work", () => {
       index: getRandomNumber(),
     };
 
-    const nonce = blockchain.proofOfWork(previousBlockHash, blockData);
+    const nonce = proofOfWork(previousBlockHash, blockData);
 
     expect(nonce).toBeGreaterThanOrEqual(0);
 
-    const hash = blockchain.hashBlock(previousBlockHash, blockData, nonce);
+    const hash = hashBlock(previousBlockHash, blockData, nonce);
 
     expect(hash.startsWith("0000")).toBeTruthy();
   });

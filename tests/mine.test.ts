@@ -1,23 +1,16 @@
 import { beforeAll, describe, expect, it } from "@jest/globals";
 
-import { getRandomNumber } from "./utils/getRandomNumber";
+import { createTransactionData } from "./utils/createTransactionData";
 import { getRandomString } from "./utils/getRandomString";
+import { removeIdFromTransaction } from "./utils/removeIdFromTransaction";
 
 import { Blockchain } from "../src/blockchain";
 import { Transaction } from "../src/types/Transaction";
-import { MINER_REWARD } from "../src/utils/constants";
+import { MINER_REWARD, MINER_REWARD_SENDER } from "../src/utils/constants";
 
 const transactionsInBlock1: Transaction[] = [
-  {
-    amount: getRandomNumber(),
-    sender: getRandomString(),
-    recipient: getRandomString(),
-  },
-  {
-    amount: getRandomNumber(),
-    sender: getRandomString(),
-    recipient: getRandomString(),
-  },
+  createTransactionData(),
+  createTransactionData(),
 ];
 
 describe("mine", () => {
@@ -30,24 +23,38 @@ describe("mine", () => {
 
     // add transactions
     for (const tx of transactionsInBlock1) {
-      blockchain.createNewTransaction(tx.amount, tx.sender, tx.recipient);
+      const transaction = blockchain.createNewTransaction(
+        tx.amount,
+        tx.sender,
+        tx.recipient
+      );
+      blockchain.addTransactionToPendingTransactions(transaction);
     }
   });
 
-  it("mine", function () {
+  it("mine", async function () {
     const lastBlock = blockchain.getLastBlock();
 
     expect(blockchain.pendingTransactions.length).toEqual(
       transactionsInBlock1.length
     );
 
-    const block = blockchain.mine();
+    const block = await blockchain.mine();
 
     expect(block.previousBlockHash).toEqual(lastBlock.hash);
-    expect(block.transactions).toEqual([
+    expect(block.transactions.map(removeIdFromTransaction)).toEqual([
       ...transactionsInBlock1,
-      { sender: "00", recipient: nodeAddress, amount: MINER_REWARD },
     ]);
-    expect(blockchain.pendingTransactions.length).toEqual(0);
+    expect(blockchain.pendingTransactions.length).toEqual(1);
+    expect(blockchain.pendingTransactions.map(removeIdFromTransaction)).toEqual(
+      [
+        {
+          sender: MINER_REWARD_SENDER,
+          recipient: nodeAddress,
+          amount: MINER_REWARD,
+          transactionId: "",
+        },
+      ]
+    );
   });
 });

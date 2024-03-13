@@ -6,6 +6,7 @@ import { getRandomString } from "./utils/getRandomString";
 
 import { Blockchain } from "../src/blockchain";
 import { CurrentBlockData } from "../src/types/CurrentBlockData";
+import { hashBlock } from "../src/utils/hashBlock";
 
 describe("hash block", () => {
   let blockchain: Blockchain;
@@ -27,15 +28,15 @@ describe("hash block", () => {
       index: getRandomNumber(),
     };
 
-    const hash = blockchain.hashBlock(previousBlockHash, blockData, nonce);
+    const hash = hashBlock(previousBlockHash, blockData, nonce);
     expect(typeof hash).toEqual("string");
-    const hash2 = blockchain.hashBlock(previousBlockHash, blockData, nonce);
+    const hash2 = hashBlock(previousBlockHash, blockData, nonce);
     expect(typeof hash2).toEqual("string");
     expect(hash2).toEqual(hash);
 
     const blockData2 = { ...blockData };
     blockData2.transactions.length = 1;
-    const hash3 = blockchain.hashBlock(previousBlockHash, blockData2, nonce);
+    const hash3 = hashBlock(previousBlockHash, blockData2, nonce);
     expect(typeof hash3).toEqual("string");
     expect(hash3).not.toEqual(hash);
   });

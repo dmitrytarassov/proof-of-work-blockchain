@@ -11,5 +11,6 @@ export function createTransactionData(): Transaction {
     sender,
     recipient,
     amount,
+    transactionId: "",
   };
 }

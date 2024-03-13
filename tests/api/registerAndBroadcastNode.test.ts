@@ -1,10 +1,10 @@
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 
+import { blockchainUrl } from "../../src/api/routes/blockchain";
 import { registerAndBroadcastNodeUrl } from "../../src/api/routes/registerAndBroadcastNode";
 import { createBlockchainNodeAndApi } from "../utils/createBlockchainNodeAndApi";
 import { getPort } from "../utils/getPort";
-import { getRandomNumberInclusive } from "../utils/getRandomNumberInclusive";
 
 describe("registerAndBroadcastNode", () => {
   const port = getPort();
@@ -17,5 +17,13 @@ describe("registerAndBroadcastNode", () => {
 
     expect(blockchain.networkNodes.has(blockchain2.nodeUrl)).toBeTruthy();
     expect(blockchain2.blockchain.networkNodes.has(nodeUrl)).toBeTruthy();
+
+    const api1response = await request(api).get(blockchainUrl);
+    expect(
+      api1response.body.networkNodes.includes(blockchain2.nodeUrl)
+    ).toBeTruthy();
+
+    const api2response = await request(blockchain2.api).get(blockchainUrl);
+    expect(api2response.body.networkNodes.includes(nodeUrl)).toBeTruthy();
   });
 });
